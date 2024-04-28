@@ -34,6 +34,33 @@ candidate/leader->follower: response中term id比自己的高
 
 ----------------
 
+## basic paxos理论知识
+
+### Paxos Components
+- Proposers：处理客户端请求，发出提案，决定是否chose
+- Acceptors：决定是否接受提案，保存chosen的提案
+
+### 流程
+
+![](./learn_basic_paxos.png)
+
+1. Proposer 选择一个提案号 n
+2. Proposer 准备 prepare消息发送给所有的Acceptors
+3. Acceptor 检查提案号 n, 如果比自己本地的大，则接受提案，Response会携带 acceptedPropposal 和 acceptedValue 。
+4. Proposer 准备 accept消息
+5. Proposer 发送 accept消息给所有的Acceptors
+6. Acceptor 检查提案号 n, 如果大于等于自己本地的，更新本地的{acceptedPropposal 和 acceptedValue}
+7. Proposer 如果收到拒绝就返回到1继续，没有则发送commit消息
+
+### multi-paxos
+1. 使用basic paxos选一个Proposer作为leader
+2. 后续有leader 发起 accept消息（日志复制）
+3. Acceptor 检查accept消息（日志复制）
+4. leader发送commit消息
+
+
+----------------
+
 
 ## 选举流程
 client端：没有找到
